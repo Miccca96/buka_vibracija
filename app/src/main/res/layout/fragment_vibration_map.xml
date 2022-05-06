@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".VibrationMapFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent">
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/vibration_chart"
+            android:layout_width="match_parent"
+            android:layout_height="400dp" />
+
+        <Button
+            android:id="@+id/start_vibration_button"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Start"
+            android:layout_below="@+id/vibration_chart"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="18dp"/>
+
+        <Button
+            android:id="@+id/stop_vibration_button"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_below="@+id/start_vibration_button"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="18dp"
+            android:text="Stop"
+            />
+
+        <TextView
+            android:id="@+id/vibration_time_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginEnd="12dp"
+            android:layout_marginTop="21dp"
+            android:text="TextView"
+            tools:ignore="RtlCompat" />
+
+        <ToggleButton
+            android:id="@+id/displayXAxis"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignTop="@+id/start_vibration_button"
+            android:layout_marginStart="26dp"
+            android:textOn="X"
+            android:textOff="X"
+            android:visibility="invisible"
+            tools:ignore="RtlCompat" />
+    </RelativeLayout>
+
+    </ScrollView>
+
+</FrameLayout>
