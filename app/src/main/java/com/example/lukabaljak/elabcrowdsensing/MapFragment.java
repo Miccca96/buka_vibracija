@@ -233,7 +233,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         @Override
         protected JSONArray doInBackground(String... strings) {
-            HTTPBroker.GET("http://www.skyvideo.rs/rec/controller.php?action=allVib");
+            //HTTPBroker.GET("http://www.skyvideo.rs/rec/controller.php?action=allVib");
             Log.d("RESPONSE", HTTPBroker.stream);
             try {
                 JSONArray jsonArray = new JSONArray(HTTPBroker.stream);

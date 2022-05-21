@@ -163,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
 
     private class PostData extends AsyncTask<String, Void, String> {
 
+        //to je nit koja se izvrsava u pozadini  i ne moramo manuelno da je pozivamo
         @Override
         protected String doInBackground(String... strings) {
             String urlString = strings[0];
@@ -171,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
             //posle
             HTTPBroker.POSTWithCertificate(getApplicationContext(), urlString,json);
             if(HTTPBroker.stream!=null){
+                //ceka se odgovor
                Log.d("RESPONSE", HTTPBroker.stream);
            }
 
