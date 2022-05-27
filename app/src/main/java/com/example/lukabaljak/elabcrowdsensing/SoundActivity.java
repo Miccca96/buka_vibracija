@@ -1,6 +1,7 @@
 package com.example.lukabaljak.elabcrowdsensing;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -51,7 +52,7 @@ import java.util.TimerTask;
 import java.util.TreeMap;
 
 
-public class SoundActivity extends AppCompatActivity implements MapFragment.OnFragmentInteractionListener, ChartFragment.OnFragmentInteractionListener {
+public class SoundActivity extends AppCompatActivity implements MapFragment.OnFragmentInteractionListener, ChartFragment.OnFragmentInteractionListener, SettingsFragment.OnFragmentInteractionListener {
 
     public static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 2;
@@ -72,15 +73,26 @@ public class SoundActivity extends AppCompatActivity implements MapFragment.OnFr
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sound);
-        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //odkomentarisano
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        //dodato
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
 
         navigationView = (NavigationView) findViewById(R.id.nvView);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
+                    case R.id.nav_home:
+                        Log.d("nav", "record");
+                        Intent intent = new Intent(SoundActivity.this, SecondActivity.class);
+                        startActivity(intent);
+                        return true;
                     case R.id.nav_record_fragment:
                         Log.d("nav", "record");
                         handleOnNavigationItemSelected(RECORD_FRAGMENT);
@@ -99,6 +111,16 @@ public class SoundActivity extends AppCompatActivity implements MapFragment.OnFr
         });
 
         handleOnNavigationItemSelected(RECORD_FRAGMENT);
+    }
+
+    //dodato
+    @Override
+    public void onBackPressed() {
+        if(mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     private void handleOnNavigationItemSelected(String fragment) {
@@ -120,7 +142,7 @@ public class SoundActivity extends AppCompatActivity implements MapFragment.OnFr
             default:
                 return;
         }
-
+//za upravljanje fragmentom
         if (fragmentLastIndex > -1) {
             String fragmentName = getSupportFragmentManager()
                     .getBackStackEntryAt(fragmentLastIndex)
@@ -173,6 +195,7 @@ public class SoundActivity extends AppCompatActivity implements MapFragment.OnFr
         super.onPause();
     }
 
+    //https://localcoder.org/how-to-check-if-permission-is-granted-by-user-at-runtime-on-android
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
@@ -241,8 +264,9 @@ public class SoundActivity extends AppCompatActivity implements MapFragment.OnFr
             //sortiranje
             TreeMap<Integer, Double> sorted = new TreeMap<>();
             sorted.putAll(mapForSorting);
-
+            //ovde se nalazi glavni algoritam za slanje podataka na API
             JSONArray jsonArray = new JSONArray();
+            //app meri buku i salje do platforme json niz sa drugim meta podacima kao sto su lokacija i naziv i opis
             for (Map.Entry<Integer, Double> entry : sorted.entrySet()) {
                 Integer key = entry.getKey();
                 Double value = entry.getValue();
@@ -262,7 +286,7 @@ public class SoundActivity extends AppCompatActivity implements MapFragment.OnFr
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
+        //ovo je API za slanje podataka
         String urlString = "https://crowdsensing.elab.fon.bg.ac.rs/a1.php?vib=0";
         String newValue = request.toString();
 
@@ -272,6 +296,13 @@ public class SoundActivity extends AppCompatActivity implements MapFragment.OnFr
 
 
     int brojPokusaja = 0;
+
+    //kada se pozove fragment setting izbacuje gresku potom je dodato  implements SettingsFragment.OnFragmentInteractionListener
+    //to je zahtevalo da se override-uje metoda onFragmentInteraction i ostavljena je prazna, a fragment sad radi
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
 
     private class PostData extends AsyncTask<String, Void, String> {
 
@@ -303,7 +334,7 @@ public class SoundActivity extends AppCompatActivity implements MapFragment.OnFr
                     @Override
                     public void run() {
                         HTTPBroker.POSTWithCertificate(getApplicationContext(), urlString, newValue);
-
+                        //ako nema internet konekciju da bude neuspesno
                         if (HTTPBroker.stream != null) {
                             Log.d("RESPONSE", HTTPBroker.stream);
                             HTTPBroker.stream = null;
