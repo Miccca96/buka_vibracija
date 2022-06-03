@@ -67,6 +67,8 @@ public class SoundActivity extends AppCompatActivity implements MapFragment.OnFr
     private NavigationView navigationView = null;
 
     private LatLng currentLocation = null;
+    ///HashMap je struktura koja omogućava skladištenje (ključ, vrednost) stavki.
+    /// Heš funkcija uparuje svaki ključ sa indeksom niza gde će se čuvati vrednost.
     private HashMap<String, Double> signalMap = null;
 
     @Override
@@ -83,6 +85,9 @@ public class SoundActivity extends AppCompatActivity implements MapFragment.OnFr
         mDrawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
+
+        ///Poziva se kada je izabrana stavka u meniju za navigaciju.
+        /// salje joj se kao parametar selektovana stavka, a vraca true da oznaci koja je stavka selektovana
         navigationView = (NavigationView) findViewById(R.id.nvView);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -99,8 +104,10 @@ public class SoundActivity extends AppCompatActivity implements MapFragment.OnFr
                         return true;
                     case R.id.nav_map_fragment:
                         Log.d("nav", "record");
-                        handleOnNavigationItemSelected(MAP_FRAGMENT);
-                        return true;
+                        Intent intent1 = new Intent(SoundActivity.this, com.example.lukabaljak.elabcrowdsensing.Map.class);
+                        startActivity(intent1);
+                        //handleOnNavigationItemSelected(MAP_FRAGMENT);
+                        return false; //da ne bi kada se korisnik vrati ostalo oznaceno da je na mapi
                     case R.id.nav_settings_fragment:
                         Log.d("nav", "record");
                         handleOnNavigationItemSelected(SETTINGS_FRAGMENT);
@@ -117,6 +124,7 @@ public class SoundActivity extends AppCompatActivity implements MapFragment.OnFr
     @Override
     public void onBackPressed() {
         if(mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            ///drawer je otvoren
             mDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
@@ -130,9 +138,10 @@ public class SoundActivity extends AppCompatActivity implements MapFragment.OnFr
         mDrawerLayout.closeDrawer(Gravity.START);
 
         switch (fragment) {
-            case MAP_FRAGMENT:
+            /*case MAP_FRAGMENT:
                 fragmentView = MapFragment.newInstance(Constants.SOUND);
-                break;
+                //fragmentView = MapFragment.newInstance();
+                break;*/
             case RECORD_FRAGMENT:
                 fragmentView = ChartFragment.newInstance();
                 break;
@@ -170,6 +179,9 @@ public class SoundActivity extends AppCompatActivity implements MapFragment.OnFr
         super.onStart();
     }
 
+
+
+    ///?
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
