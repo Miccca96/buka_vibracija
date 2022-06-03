@@ -58,10 +58,10 @@ public class VibrationActivity extends AppCompatActivity implements MapFragment.
                         Log.d("nav", "record");
                         handleOnNavigationItemSelected(MAP_FRAGMENT);
                         return true;
-                    case R.id.nav_settings_fragment:
+                  /*  case R.id.nav_settings_fragment:
                         Log.d("nav", "record");
                         handleOnNavigationItemSelected(SETTINGS_FRAGMENT);
-                        return true;
+                        return true; */
                 }
                 return false;
             }
@@ -94,9 +94,9 @@ public class VibrationActivity extends AppCompatActivity implements MapFragment.
             case RECORD_FRAGMENT:
                 fragmentView = VibrationMapFragment.newInstance();
                 break;
-            case SETTINGS_FRAGMENT:
+          /*  case SETTINGS_FRAGMENT:
                 fragmentView = null;
-                break;
+                break; */
             default:
                 return;
         }

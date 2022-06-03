@@ -101,10 +101,10 @@ public class SoundActivity extends AppCompatActivity implements MapFragment.OnFr
                         Log.d("nav", "record");
                         handleOnNavigationItemSelected(MAP_FRAGMENT);
                         return true;
-                    case R.id.nav_settings_fragment:
+                   /* case R.id.nav_settings_fragment:
                         Log.d("nav", "record");
                         handleOnNavigationItemSelected(SETTINGS_FRAGMENT);
-                        return true;
+                        return true; */
                 }
                 return false;
             }
@@ -136,9 +136,9 @@ public class SoundActivity extends AppCompatActivity implements MapFragment.OnFr
             case RECORD_FRAGMENT:
                 fragmentView = ChartFragment.newInstance();
                 break;
-            case SETTINGS_FRAGMENT:
+           /* case SETTINGS_FRAGMENT:
                 fragmentView = new SettingsFragment();
-                break;
+                break; */
             default:
                 return;
         }
