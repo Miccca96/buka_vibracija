@@ -104,14 +104,16 @@ public class SoundActivity extends AppCompatActivity implements MapFragment.OnFr
                         return true;
                     case R.id.nav_map_fragment:
                         Log.d("nav", "record");
+
                         Intent intent1 = new Intent(SoundActivity.this, com.example.lukabaljak.elabcrowdsensing.Map.class);
                         startActivity(intent1);
                         //handleOnNavigationItemSelected(MAP_FRAGMENT);
                         return false; //da ne bi kada se korisnik vrati ostalo oznaceno da je na mapi
-                    case R.id.nav_settings_fragment:
+                   /* case R.id.nav_settings_fragment:
+
                         Log.d("nav", "record");
                         handleOnNavigationItemSelected(SETTINGS_FRAGMENT);
-                        return true;
+                        return true; */
                 }
                 return false;
             }
@@ -145,9 +147,9 @@ public class SoundActivity extends AppCompatActivity implements MapFragment.OnFr
             case RECORD_FRAGMENT:
                 fragmentView = ChartFragment.newInstance();
                 break;
-            case SETTINGS_FRAGMENT:
+           /* case SETTINGS_FRAGMENT:
                 fragmentView = new SettingsFragment();
-                break;
+                break; */
             default:
                 return;
         }
