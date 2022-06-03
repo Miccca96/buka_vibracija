@@ -7,7 +7,6 @@
 
     <!-- TODO: Update blank fragment layout -->
     <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_height="match_parent"
         android:layout_width="match_parent">
 
@@ -16,15 +15,15 @@
             android:layout_width="match_parent"
             android:layout_height="400dp" />
 
-
+        <!-- bilo je 18dp marginTop -->
+        <!-- Podesavanja postavljena ispod grafika, radi lapseg prikaza -->
         <Button
             android:id="@+id/settingsButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:text="Podešavanja"
             android:layout_marginLeft="12dp"
-            />
+            android:layout_marginTop="500dp"
+            android:text="Podešavanja" />
 
         <Button
             android:id="@+id/start_recording_button"
@@ -33,7 +32,7 @@
             android:text="Start"
             android:layout_below="@+id/vibration_chart"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="18dp" />
+            android:layout_marginTop="500dp" />
 
         <Button
             android:id="@+id/stop_recording_button"
@@ -41,7 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_below="@+id/vibration_chart"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="500dp"
             android:text="Stop"
             android:visibility="gone" />
 

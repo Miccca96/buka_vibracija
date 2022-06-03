@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.support.v4.app.ActivityCompat;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -41,13 +43,20 @@ import org.json.JSONObject;
  */
 public class MapFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap mMap;
-    private FusedLocationProviderClient mFusedLocationClient;
     private Marker userLocationMarker;
+    private FusedLocationProviderClient mFusedLocationClient;
     private LocationCallback mLocationCallback = null;
     private LocationRequest mLocationRequest = null;
     private OnFragmentInteractionListener mListener;
 
     private static int vrstaSnimanja;
+
+
+
+
+
+
+
 
     public MapFragment() {
         // Required empty public constructor
@@ -65,25 +74,50 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_map, container, false);
 
+
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+
+/*
+        mapFragment.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(final GoogleMap googleMap) {
+                googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                    @Override
+                    public void onMapClick(LatLng latLng) {
+                        MarkerOptions options = new MarkerOptions();
+                        options.position(latLng);
+                        options.title(latLng.latitude + " : " + latLng.longitude);
+                        googleMap.clear();
+                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 44));
+                        googleMap.addMarker(options);
+                    }
+                });
+            }
+        });
+*/
         mapFragment.getMapAsync(this);
         return view;
     }
 
+
+
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+       mMap = googleMap;
 
-        /*LatLng sydney = new LatLng(-34, 151);
+       LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mListener.onLocationChange(sydney);
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));*/
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
+        /*
         if (vrstaSnimanja == Constants.SOUND) {
             GetSound getSound = new GetSound();
             getSound.execute();
@@ -91,6 +125,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             GetVibration getVibration = new GetVibration();
             getVibration.execute();
         }
+
+
+
+*/
+
+
 
 
     }
@@ -112,6 +152,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                 }
 
                                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+
                                 CameraUpdate updateCamera = CameraUpdateFactory.newLatLng(latLng);
                                 userLocationMarker = mMap.addMarker(new MarkerOptions().position(latLng));
 
@@ -147,13 +188,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onStart() {
         super.onStart();
-//        startLocationUpdates();
+    // startLocationUpdates();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        //stopLocationUpdates();
+    //    stopLocationUpdates();
     }
 
     @Override
@@ -174,6 +215,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mListener = null;
     }
 
+
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -189,6 +232,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         void onLocationChange(LatLng latLng);
     }
 
+
+
+/*
     private class GetSound extends AsyncTask<String, Void, JSONArray> {
 
         @Override
@@ -196,7 +242,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
             HTTPBroker.GET("http://www.skyvideo.rs/rec/controller.php?action=allMap&basic=1");
             Log.d("RESPONSE", HTTPBroker.stream);
-            try {
+           try {
                 JSONArray jsonArray = new JSONArray(HTTPBroker.stream);
                 return jsonArray;
             } catch (JSONException e) {
@@ -226,14 +272,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
 
         }
-    }
+    }*/
 
-
+/*
     private class GetVibration extends AsyncTask<String, Void, JSONArray> {
 
         @Override
         protected JSONArray doInBackground(String... strings) {
-            //HTTPBroker.GET("http://www.skyvideo.rs/rec/controller.php?action=allVib");
+            HTTPBroker.GET("http://www.skyvideo.rs/rec/controller.php?action=allVib");
             Log.d("RESPONSE", HTTPBroker.stream);
             try {
                 JSONArray jsonArray = new JSONArray(HTTPBroker.stream);
@@ -277,7 +323,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
             Log.d("VelicinaNizaVIbracija", jsonArray.length() + "");
         }
-    }
-
+    }*/
 
 }
