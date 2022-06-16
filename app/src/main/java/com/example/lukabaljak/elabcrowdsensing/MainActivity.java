@@ -50,6 +50,11 @@ public class MainActivity extends AppCompatActivity {
 
         _signupButton = findViewById(R.id.btn_signup);
     }
+    public void signupWithoutData(View view) {
+        Intent intent = new Intent(this, SecondActivity.class);
+        startActivity(intent);
+        finish();
+    }
 
     public void signup(View view) {
         Log.d(TAG, "Signup");
