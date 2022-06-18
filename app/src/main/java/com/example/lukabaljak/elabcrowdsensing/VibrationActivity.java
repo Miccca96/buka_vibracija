@@ -53,6 +53,9 @@ public class VibrationActivity extends AppCompatActivity implements MapFragment.
                     case R.id.nav_record_fragment:
                         Log.d("nav", "record");
                         handleOnNavigationItemSelected(RECORD_FRAGMENT);
+                        //Intent intent1 = new Intent(VibrationActivity.this, VibrationMap.class);
+                        //Intent intent1 = new Intent(VibrationActivity.this, FFT.class);
+                        //startActivity(intent1);
                         return true;
                     case R.id.nav_map_fragment:
                         Log.d("nav", "record");

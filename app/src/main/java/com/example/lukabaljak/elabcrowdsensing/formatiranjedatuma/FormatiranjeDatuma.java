@@ -20,7 +20,7 @@ public class FormatiranjeDatuma {
         GregorianCalendar datumIVreme = new GregorianCalendar();
         datumIVreme.setTime(date);
         //zato sto u GC brojanje krece od 0, a u Date od 1 lol
-        datumIVreme.set(GregorianCalendar.MONTH, datumIVreme.get(GregorianCalendar.MONTH)+1);
+        datumIVreme.set(GregorianCalendar.MONTH, datumIVreme.get(GregorianCalendar.MONTH));
      return datumIVreme;
     }
 
