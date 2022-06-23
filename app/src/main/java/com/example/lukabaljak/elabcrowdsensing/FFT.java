@@ -34,6 +34,7 @@ import com.github.mikephil.charting.data.LineDataSet;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jtransforms.fft.DoubleFFT_1D;
 import org.jtransforms.fft.FloatFFT_1D;
 
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
 
-public class VibrationMapFragment extends Fragment implements SensorEventListener {
+public class FFT extends Fragment implements SensorEventListener {
 
     private OnFragmentInteractionListener mListener;
     private Sensor mySensor;
@@ -57,7 +58,7 @@ public class VibrationMapFragment extends Fragment implements SensorEventListene
 
     private Button startButton, stopButton;
     ToggleButton displayXToggle;
-    Boolean displayX = true;
+
     Map<String, Boolean> displayAxis;
     private TextView timeView;
     private int totalSeconds;
@@ -65,10 +66,16 @@ public class VibrationMapFragment extends Fragment implements SensorEventListene
     final int MAX_CAPACITY = 8192;
     final int GRAPH_CAPACITY = 128;
 
+    float Fs = 8000;
+    float T = 1/Fs;
+    int L = 1600;
+
+    float freq = 338;
+
     List<Merenje> merenja;
     LocationThread locationThread;
 
-    public VibrationMapFragment() {
+    public FFT() {
         // Required empty public constructor
     }
 
@@ -77,15 +84,7 @@ public class VibrationMapFragment extends Fragment implements SensorEventListene
         super.onStop();
         locationThread.destroyLocationService();
     }
-/*
-    public static VibrationMapFragment newInstance(String param1, String param2) {
-        VibrationMapFragment fragment = new VibrationMapFragment();
-        Bundle args = new Bundle();
 
-        fragment.setArguments(args);
-        return fragment;
-    }
-*/
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -142,15 +141,12 @@ public class VibrationMapFragment extends Fragment implements SensorEventListene
         return view;
     }
 
-    ///iscrtavanje po x osi
     private void displayGraphForAxis(String axis) {
         if (displayAxis.get(axis) == true) {
             displayAxis.put(axis, false);
-            //Log.d("displayX kad je true", displayAxis.get(axis) + "");
             displayXToggle.setBackgroundColor(Color.RED);
         } else {
             displayAxis.put(axis, true);
-            //Log.d("displayX kad je false", displayAxis.get(axis) + "");
             displayXToggle.setBackgroundColor(Color.LTGRAY);
         }
     }
@@ -197,11 +193,7 @@ public class VibrationMapFragment extends Fragment implements SensorEventListene
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
 
-        /*Log.d("PORUKA", "(θ/2):" + Math.toDegrees(Math.acos(sensorEvent.values[3]))*2 +
-                "x*sin(θ/2):" + sensorEvent.values[0] +
-                " , y*sin(θ/2):" + sensorEvent.values[1] +
-                ", z*sin(θ/2):" + sensorEvent.values[2]
-        );*/
+
 
         if (sensorEvent.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
             vibrations = new float[]{sensorEvent.values[0],
@@ -224,22 +216,13 @@ public class VibrationMapFragment extends Fragment implements SensorEventListene
         float[] R = new float[9];
         float[] I = new float[9];
         SensorManager.getRotationMatrix(R, I, vibrations, angles);
-        //printMatrixToLog(R,"rotation");
-        //printMatrixToLog(I, "inclination");
         transformToActualVibrations(R);
     }
 
-    //transformacija podaataka
     private void transformToActualVibrations(float[] R) {
         actualVibrations[0] = R[0] * vibrations[0] + R[1] * vibrations[1] + R[2] * vibrations[2];
         actualVibrations[1] = R[3] * vibrations[0] + R[4] * vibrations[1] + R[5] * vibrations[2];
         actualVibrations[2] = R[6] * vibrations[0] + R[7] * vibrations[1] + R[8] * vibrations[2];
-        //ispis
-        // Log.d("vibrations", "X:" + vibrations[0] + "Y:" + vibrations[1] + "Z:" + vibrations[2]);
-        //Log.d("ActualVibrations", "X:" + actualVibrations[0] + "Y:" + actualVibrations[1] + "Z:" + actualVibrations[2]);
-
-        //Log.d("vibrationSum", String.valueOf(arraySum(vibrations)));
-        //Log.d("ActualVibrationSum", String.valueOf(arraySum(actualVibrations)));
 
         if (iX == arrayX.length) {
             return;
@@ -260,8 +243,6 @@ public class VibrationMapFragment extends Fragment implements SensorEventListene
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
     }
-
-
 
     public void start(View view) {
 
@@ -291,8 +272,6 @@ public class VibrationMapFragment extends Fragment implements SensorEventListene
                     public void run() {
                         Log.d("VIBR", actualVibrations[0] + " " + actualVibrations[1] + " " + actualVibrations[2]);
                         timeView.setText(String.valueOf(totalSeconds++));
-
-
                         Merenje merenje = new Merenje(actualVibrations[0], actualVibrations[1], actualVibrations[2],
                                 new GregorianCalendar(), locationThread.getLocation().getLongitude(), locationThread.getLocation().getLatitude());
                         merenja.add(merenje);
@@ -305,7 +284,6 @@ public class VibrationMapFragment extends Fragment implements SensorEventListene
 
     }
 
-    //crtanje grafika
     private void drawGraph() {
         vibrationChart.clear();
         chartDataEntries.clear();
@@ -318,35 +296,72 @@ public class VibrationMapFragment extends Fragment implements SensorEventListene
             int iVibrations, iFFT;
             for (iVibrations = iX - GRAPH_CAPACITY, iFFT = 0; (iVibrations < iX) && (iFFT < GRAPH_CAPACITY); iVibrations++, iFFT++) {
                 fftResult[iFFT] = (arrayX[iVibrations] + arrayY[iVibrations] + arrayZ[iVibrations]) / 3;
-                //Log.d("POSLE 512 VIBRACIJE", (arrayX[iVibrations] + arrayY[iVibrations] + arrayZ[iVibrations]) / 3 + "");
+
             }
 
         } else {
             fftResult = new float[iX * 2];
             for (int i = 0; i < iX; i++) {
-                //Log.d("fftResult punjenje","dyy");
                 fftResult[i] = (arrayX[i] + arrayY[i] + arrayZ[i]) / 3;
-                //Log.d("PRE 512 VIBRACIJE", (arrayX[i] + arrayY[i] + arrayZ[i]) / 3 + "");
             }
         }
 
-        FloatFFT_1D fft = new FloatFFT_1D(fftResult.length);
-        fft.realForward(fftResult);
 
+        float sinValue_re_im[] = new float[L*2];
+        // because FFT takes an array where its positions alternate between real and imaginary
+        for( int i = 0; i < L; i++)
+        {
+            sinValue_re_im[2*i] = (float)Math.sin( 2*Math.PI*freq*(i * T) );
+            // real part
+            sinValue_re_im[2*i+1] = 0; //imaginary part
+        }
+
+        FloatFFT_1D fft = new FloatFFT_1D(L);
+        fft.complexForward(sinValue_re_im);
+        float[] tf = sinValue_re_im.clone();
+
+
+
+        float[] P2 = new float[L];
+        for(int i=0; i<L; i++){
+            float re = tf[2*i]/L;
+            float im = tf[2*i+1]/L;
+            P2[i] =(float) Math.sqrt(re*re+im*im);
+
+            //Log.d("re kod crteza",re+"");
+            //Log.d("im kod crteza",im+"");
+
+            Entry point = new Entry(i * 5, P2[i]);
+            chartDataEntries.add(point);
+        }
+
+
+        float[] P1 = new float[L/2];
+        // single-sided: the second half of P2 has the same values as the first half
+        System.arraycopy(P2, 0, P1, 0, L/2);
+        System.arraycopy(P1, 1, P1, 1, L/2-2);
+        for(int i=1; i<P1.length-1; i++){
+            P1[i] = 2*P1[i];
+        }
+
+        float[] f = new float[L/2 + 1];
+        for(int i=0; i<L/2+1;i++){
+            f[i] = Fs*((float) i)/L;
+        }
+
+/*
         for (int i = 0; i < fftResult.length / 2; i++) {
 
-            //Log.d("VREDNOST VIBRACIJE", fftResult[i] + "");
 
             float re = fftResult[2 * i];
             float im = fftResult[2 * i + 1];
 
             float res = (float) Math.sqrt(re * re + im * im);
 
-            //int downy = (int) ((fftResult[i] * 10));
             Entry point = new Entry(i * 5, res);
             chartDataEntries.add(point);
         }
-
+*/
         LineDataSet lineDataSet = new LineDataSet(chartDataEntries, "");
         vibrationChart.getXAxis().setAxisMaximum(GRAPH_CAPACITY * 5);
         lineDataSet.setColor(Color.RED);
@@ -441,17 +456,68 @@ public class VibrationMapFragment extends Fragment implements SensorEventListene
         FloatFFT_1D fft = new FloatFFT_1D(fftResultX.length);
         fft.realForward(fftResultX);
 
+        Log.d("FFT RESULT",fftResultX.length+" ");
+
         TreeMap<Integer, Double> treeMap = new TreeMap<>();
-        for (int i = 0; i < fftResultX.length / 2; i++) {
+
+
+
+
+
+        float sinValue_re_im[] = new float[L*2];
+        // because FFT takes an array where its positions alternate between real and imaginary
+        for( int i = 0; i < L; i++)
+        {
+            sinValue_re_im[2*i] = (float)Math.sin( 2*Math.PI*freq*(i * T) );
+            // real part
+            sinValue_re_im[2*i+1] = 0; //imaginary part
+        }
+
+        fft = new FloatFFT_1D(L);
+        fft.complexForward(sinValue_re_im);
+        float[] tf = sinValue_re_im.clone();
+
+
+
+        float[] P2 = new float[L];
+        for(int i=0; i<L; i++){
+            float re = tf[2*i]/L;
+            float im = tf[2*i+1]/L;
+            P2[i] =(float) Math.sqrt(re*re+im*im);
+
+           // Log.d("re kod stopa",re+"");
+           // Log.d("im kod stopa",im+"");
+
+
+            Entry point = new Entry(i * 5, P2[i]);
+            chartDataEntries.add(point);
+        }
+
+
+        float[] P1 = new float[L/2];
+        // single-sided: the second half of P2 has the same values as the first half
+        System.arraycopy(P2, 0, P1, 0, L/2);
+        System.arraycopy(P1, 1, P1, 1, L/2-2);
+        for(int i=1; i<P1.length-1; i++){
+            P1[i] = 2*P1[i];
+        }
+
+        float[] f = new float[L/2 + 1];
+        for(int i=0; i<L/2+1;i++){
+            f[i] = Fs*((float) i)/L;
+        }
+
+        /*for (int i = 0; i < fftResultX.length / 2; i++) {
             float re = fftResultX[2 * i];
             float im = fftResultX[2 * i + 1];
 
-            //Log.d("re kod stopa",re+" ");
-            //Log.d("im kod stopa",im+" ");
+            Log.d("re kod stopa",re+" ");
+            Log.d("im kod stopa",im+" ");
+
 
             float res = (float) Math.sqrt(re * re + im * im);
             treeMap.put(i * 5, Double.valueOf(res));
-        }
+        }*/
 
         Log.d("velicina drveta", treeMap.size() + "");
 
@@ -492,7 +558,6 @@ public class VibrationMapFragment extends Fragment implements SensorEventListene
         rezultatMerenja.setKontekst("at_home");
         String listaMerenjaUJSONu = Common.dajBoljuListuMerenjaUJSONU(rezultatMerenja, kontekstVibracije);
         String MACAddress = Common.getWifiMacAddress();
-        //Log.d("REzultatMerenjaUJSONU", listaMerenjaUJSONu);
         String glavniJSON = Common.dajCeoJSON(macAddress, "23.1.2019. 2:41:38", listaMerenjaUJSONu, jsonArrayX, jsonArrayY, jsonArrayZ);
         Log.d("listaMerenjaUJSONu", listaMerenjaUJSONu);
         Log.d("glavniUJSONu", glavniJSON);
@@ -579,8 +644,6 @@ public class VibrationMapFragment extends Fragment implements SensorEventListene
             treeMap.put(i * 5, Double.valueOf(res));
         }
 
-        //Log.d("velicina drveta", treeMap.size() + "");
-
         JSONArray jsonArrayY = new JSONArray();
         for (Map.Entry<Integer, Double> entry : treeMap.entrySet()) {
             JSONObject jsonObject = new JSONObject();
@@ -617,7 +680,6 @@ public class VibrationMapFragment extends Fragment implements SensorEventListene
             treeMap.put(i * 5, Double.valueOf(res));
         }
 
-        //Log.d("velicina drveta", treeMap.size() + "");
 
         JSONArray jsonArrayZ = new JSONArray();
         for (Map.Entry<Integer, Double> entry : treeMap.entrySet()) {
@@ -677,7 +739,6 @@ public class VibrationMapFragment extends Fragment implements SensorEventListene
 
             if (HTTPBroker.stream != null) {
                 Log.d("RESPONSE", HTTPBroker.stream);
-                //Toast.makeText(getActivity().getApplicationContext(), "Podaci su uspešno poslati.", Toast.LENGTH_SHORT).show();
 
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -689,11 +750,11 @@ public class VibrationMapFragment extends Fragment implements SensorEventListene
                 HTTPBroker.stream = null;
             } else {
                 Log.d("RESPONSE", "nymyyyyy");
-                 final Timer sendDataTimer = new Timer();
+                final Timer sendDataTimer = new Timer();
 
                 sendDataTimer.schedule(new TimerTask() {
                     @Override
-                     public void run() {
+                    public void run() {
                         HTTPBroker.POSTWithCertificate(getActivity().getApplicationContext(), urlString, newValue);
 
                         if (HTTPBroker.stream != null) {
@@ -714,7 +775,7 @@ public class VibrationMapFragment extends Fragment implements SensorEventListene
                             Log.d("Tried", "but faileeed");
                             brojPokusaja = 0;
                             uspeo = false;
-                             getActivity().runOnUiThread(new Runnable() {
+                            getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     Toast.makeText(getActivity().getApplicationContext(), "Podaci nisu uspešno poslati, obezbedite internet konekciju.", Toast.LENGTH_SHORT).show();
@@ -740,3 +801,4 @@ public class VibrationMapFragment extends Fragment implements SensorEventListene
     }
 
 }
+
