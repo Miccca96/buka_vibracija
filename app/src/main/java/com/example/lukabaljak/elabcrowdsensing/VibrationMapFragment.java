@@ -142,6 +142,7 @@ public class VibrationMapFragment extends Fragment implements SensorEventListene
         return view;
     }
 
+    ///iscrtavanje po x osi
     private void displayGraphForAxis(String axis) {
         if (displayAxis.get(axis) == true) {
             displayAxis.put(axis, false);
@@ -228,6 +229,7 @@ public class VibrationMapFragment extends Fragment implements SensorEventListene
         transformToActualVibrations(R);
     }
 
+    //transformacija podaataka
     private void transformToActualVibrations(float[] R) {
         actualVibrations[0] = R[0] * vibrations[0] + R[1] * vibrations[1] + R[2] * vibrations[2];
         actualVibrations[1] = R[3] * vibrations[0] + R[4] * vibrations[1] + R[5] * vibrations[2];
@@ -259,6 +261,8 @@ public class VibrationMapFragment extends Fragment implements SensorEventListene
     public void onAccuracyChanged(Sensor sensor, int i) {
     }
 
+
+
     public void start(View view) {
 
         enableButtons("start");
@@ -287,6 +291,8 @@ public class VibrationMapFragment extends Fragment implements SensorEventListene
                     public void run() {
                         Log.d("VIBR", actualVibrations[0] + " " + actualVibrations[1] + " " + actualVibrations[2]);
                         timeView.setText(String.valueOf(totalSeconds++));
+
+
                         Merenje merenje = new Merenje(actualVibrations[0], actualVibrations[1], actualVibrations[2],
                                 new GregorianCalendar(), locationThread.getLocation().getLongitude(), locationThread.getLocation().getLatitude());
                         merenja.add(merenje);
@@ -299,6 +305,7 @@ public class VibrationMapFragment extends Fragment implements SensorEventListene
 
     }
 
+    //crtanje grafika
     private void drawGraph() {
         vibrationChart.clear();
         chartDataEntries.clear();

@@ -59,12 +59,15 @@ public class VibrationActivity extends AppCompatActivity implements MapFragment.
                         return true;
                     case R.id.nav_map_fragment:
                         Log.d("nav", "record");
-                        handleOnNavigationItemSelected(MAP_FRAGMENT);
-                        return true;
-                    case R.id.nav_settings_fragment:
+                        Intent intent1 = new Intent(VibrationActivity.this, com.example.lukabaljak.elabcrowdsensing.Map.class);
+                        startActivity(intent1);
+                        //handleOnNavigationItemSelected(MAP_FRAGMENT);
+                        return false; //da ne bi kada se korisnik vrati ostalo oznaceno da je na mapi                
+                  /*  case R.id.nav_settings_fragment:
+
                         Log.d("nav", "record");
                         handleOnNavigationItemSelected(SETTINGS_FRAGMENT);
-                        return true;
+                        return true; */
                 }
                 return false;
             }
@@ -97,9 +100,9 @@ public class VibrationActivity extends AppCompatActivity implements MapFragment.
             case RECORD_FRAGMENT:
                 fragmentView = VibrationMapFragment.newInstance();
                 break;
-            case SETTINGS_FRAGMENT:
+          /*  case SETTINGS_FRAGMENT:
                 fragmentView = null;
-                break;
+                break; */
             default:
                 return;
         }
